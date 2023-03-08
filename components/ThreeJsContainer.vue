@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { Scene, PerspectiveCamera, Mesh, SphereGeometry, MeshBasicMaterial, WebGLRenderer, Color, Fog } from 'three';
 import { useWindowSize } from '@vueuse/core'
+
+import { Scene, PerspectiveCamera, Mesh, SphereGeometry, MeshBasicMaterial, WebGLRenderer, Color, Fog, Event, Object3D, AmbientLight } from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // We need to wait for the template ref to get the HTML element from the template tag
 let renderer: WebGLRenderer
+
+// Declare the OrbitControls object
+let controls: OrbitControls
 
 // Let's create reference to the HTML Canvas in our template, it will be used when setting the renderer
 const canvasContainer: Ref<HTMLCanvasElement | null> = ref(null);
@@ -31,13 +36,19 @@ camera.position.set(0, 0, 4);
 
 scene.add(camera);
 
-// A Mesh is an object containing Geometry and Material to apply to it
-const sphere = new Mesh (
-    new SphereGeometry(1, 32, 32),
-    new MeshBasicMaterial({ color: 0x008080 })
-);
+// Create an ambient light to see the material, pass it a color and an intensity
+const ambientLight = new AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
 
-scene.add(sphere)
+// Get our load function from our useGLTF composable
+const { load } = useGLTFModel()
+
+// Load our model using our load composable function
+const { scene: neonSignModel } = await load('/taiwan_style_signboard_lowpoly/scene.gltf')
+
+// Here since neonSignModel is a scene we can play with it's Transform / Scale and other parameters
+neonSignModel.scale.set(0.5, 0.5, 0.5)
+scene.add(neonSignModel)
 
 function updateCamera () {
     // Update the aspect ratio of the camera
@@ -62,6 +73,13 @@ function setRenderer() {
             canvas: canvasContainer.value,
             alpha: true
         })
+        // Set the pixel ratio to better the definition of our 3D objects
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+        // Initialize our OrbitControls object using the camera and the DOM element inside of our renderer (in our case the canvas)
+        controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableDampling = true;
+
         // Initial update of the renderer since we need to do it the first time
         updateRenderer();
     }
@@ -87,15 +105,13 @@ onMounted(() => {
 
 
 const loop = () => {
-    if (sphere.position.x >= 10){
-        sphere.position.x = -10
-    }
-    sphere.position.x += 0.01;
+    controls.update();
+
     // We don't need to call updateRenderer since we only want to render
     renderer.render(scene, camera);
 
     // Callback so that the function loops indefinitely
-    requestAnimationFrame(loop)
+    requestAnimationFrame(loop);
 }
 </script>
 
