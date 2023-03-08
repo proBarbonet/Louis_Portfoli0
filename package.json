@@ -9,10 +9,15 @@
     "deploy": "gh-pages --dotfiles -d .output/public"
   },
   "devDependencies": {
+    "@types/three": "^0.149.0",
+    "98.css": "^0.1.18",
     "gh-pages": "^5.0.0",
-    "nuxt": "^3.2.3"
+    "nuxt": "^3.2.3",
+    "three": "^0.150.1"
   },
   "dependencies": {
-    "98.css": "^0.1.18"
+    "@vueuse/core": "^9.13.0",
+    "98.css": "^0.1.18",
+    "three": "^0.150.1"
   }
 }
