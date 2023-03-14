@@ -44,7 +44,8 @@ scene.add(ambientLight);
 const { load } = useGLTFModel()
 
 // Load our model using our load composable function
-const { scene: neonSignModel } = await load('/taiwan_style_signboard_lowpoly/scene.gltf')
+// On Github pages, the 3D assets must be under ./dist/client/
+const { scene: neonSignModel } = await load('taiwan_style_signboard_lowpoly/scene.gltf')
 
 // Here since neonSignModel is a scene we can play with it's Transform / Scale and other parameters
 neonSignModel.scale.set(0.5, 0.5, 0.5)
